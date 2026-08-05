@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>TestPulse</title>
+<style>
+  :root{
+    --bg:#0E141B;
+    --panel:#151D26;
+    --panel-2:#1B2430;
+    --line:#24303D;
+    --text:#DDE5ED;
+    --dim:#7C8DA0;
+    --dimmer:#4E5D6D;
+    --pass:#5FB98B;
+    --fail:#E86A5A;
+    --skip:#D9A441;
+    --steel:#6B9DC4;
+
+    --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
+    --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  }
+
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--bg);
+    color:var(--text);
+    font-family:var(--sans);
+    font-size:15px;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+
+  /* ---------- header ---------- */
+  header{
+    border-bottom:1px solid var(--line);
+    margin-bottom:36px;
+  }
+  .bar{
+    max-width:1080px;margin:0 auto;padding:18px 24px;
+    display:flex;align-items:baseline;gap:14px;
+  }
+  .logo{
+    font-family:var(--mono);
+    font-size:15px;font-weight:600;letter-spacing:.14em;
+    text-transform:uppercase;
+  }
+  .logo .pulse{color:var(--pass)}
+  .tagline{color:var(--dimmer);font-size:12.5px}
+  .refreshed{margin-left:auto;color:var(--dimmer);font-size:12px;font-family:var(--mono)}
+
+  /* ---------- hero: the strip ---------- */
+  .hero{margin-bottom:44px}
+  .eyebrow{
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--dimmer);margin-bottom:14px;
+  }
+  .strip{
+    display:flex;flex-wrap:wrap;gap:3px;
+    padding:20px;background:var(--panel);
+    border:1px solid var(--line);border-radius:4px;
+    min-height:78px;align-content:flex-start;
+  }
+  .tick{
+    width:7px;height:26px;border-radius:1.5px;
+    background:var(--pass);flex:0 0 auto;
+    transition:transform .12s ease;
+  }
+  .tick.fail{background:var(--fail)}
+  .tick.skip{background:var(--skip)}
+  .tick.crit{box-shadow:inset 0 0 0 1.5px var(--bg), 0 0 0 1.5px var(--fail)}
+  a.tick:hover,a.tick:focus-visible{transform:scaleY(1.18);outline:none}
+  a.tick:focus-visible{box-shadow:0 0 0 2px var(--steel)}
+
+  .readout{
+    display:flex;flex-wrap:wrap;gap:34px;
+    margin-top:20px;align-items:flex-end;
+  }
+  .metric .n{
+    font-family:var(--mono);font-size:34px;font-weight:600;
+    line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .metric .k{
+    font-family:var(--mono);font-size:11px;letter-spacing:.14em;
+    text-transform:uppercase;color:var(--dim);margin-top:8px;
+  }
+  .metric.ok .n{color:var(--pass)}
+  .metric.bad .n{color:var(--fail)}
+
+  /* ---------- sections ---------- */
+  section{margin-bottom:44px}
+  h2{
+    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--dimmer);
+    font-weight:600;margin:0 0 14px;
+  }
+
+  /* ---------- teams ---------- */
+  .team{
+    display:grid;
+    grid-template-columns:150px 1fr 62px 74px;
+    gap:18px;align-items:center;
+    padding:14px 18px;
+    border:1px solid var(--line);border-top:none;
+    background:var(--panel);
+  }
+  .team:first-of-type{border-top:1px solid var(--line);border-radius:4px 4px 0 0}
+  .team:last-of-type{border-radius:0 0 4px 4px}
+  .team-name{font-family:var(--mono);font-size:13.5px;font-weight:600}
+  .mini{display:flex;gap:2px;flex-wrap:wrap}
+  .mini .tick{width:5px;height:15px}
+  .pct{
+    font-family:var(--mono);font-size:14px;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .runs-n{
+    font-family:var(--mono);font-size:11.5px;color:var(--dim);
+    text-align:right;
+  }
+
+  /* ---------- runs ---------- */
+  .run{border:1px solid var(--line);border-top:none;background:var(--panel)}
+  .run:first-of-type{border-top:1px solid var(--line);border-radius:4px 4px 0 0}
+  .run:last-of-type{border-radius:0 0 4px 4px}
+
+  .run-head{
+    display:grid;
+    grid-template-columns:14px 1fr 90px 108px;
+    gap:16px;align-items:center;
+    width:100%;padding:14px 18px;
+    background:none;border:none;color:inherit;
+    font:inherit;text-align:left;cursor:pointer;
+  }
+  .run-head:hover{background:var(--panel-2)}
+  .run-head:focus-visible{outline:2px solid var(--steel);outline-offset:-2px}
+  .caret{
+    font-family:var(--mono);color:var(--dimmer);font-size:11px;
+    transition:transform .15s ease;display:inline-block;
+  }
+  .run.open .caret{transform:rotate(90deg)}
+  .run-id{font-family:var(--mono);font-size:13.5px}
+  .run-id .slash{color:var(--dimmer);margin:0 2px}
+  .run-id .proj{color:var(--dim)}
+  .run-meta{
+    font-family:var(--mono);font-size:11.5px;color:var(--dimmer);
+    margin-top:3px;
+  }
+  .tally{
+    font-family:var(--mono);font-size:13px;text-align:right;
+    font-variant-numeric:tabular-nums;
+  }
+  .tally .bad{color:var(--fail)}
+  .when{
+    font-family:var(--mono);font-size:11.5px;color:var(--dim);
+    text-align:right;
+  }
+
+  .cases{
+    border-top:1px solid var(--line);
+    padding:6px 18px 14px;background:var(--panel-2);
+  }
+  .case{
+    display:grid;grid-template-columns:8px 1fr auto;
+    gap:12px;align-items:center;
+    padding:7px 0;border-bottom:1px solid var(--line);
+    font-family:var(--mono);font-size:12.5px;
+  }
+  .case:last-child{border-bottom:none}
+  .dot{width:8px;height:8px;border-radius:50%;background:var(--pass)}
+  .dot.fail{background:var(--fail)}
+  .dot.skip{background:var(--skip)}
+  .case-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .case.is-fail .case-name{color:var(--fail)}
+  .crit-tag{
+    font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
+    color:var(--fail);border:1px solid var(--fail);
+    border-radius:2px;padding:1px 5px;margin-left:8px;vertical-align:1px;
+  }
+  .ms{color:var(--dim);font-variant-numeric:tabular-nums}
+
+  /* ---------- states ---------- */
+  .note{
+    border:1px solid var(--line);border-radius:4px;
+    background:var(--panel);padding:26px 20px;
+    color:var(--dim);font-size:13.5px;
+  }
+  .note strong{display:block;color:var(--text);margin-bottom:5px;font-size:14px}
+  .note code{
+    font-family:var(--mono);font-size:12.5px;
+    color:var(--steel);background:var(--bg);
+    padding:1px 5px;border-radius:2px;
+  }
+  .note.err{border-color:#4A2A28}
+
+  .legend{
+    display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;
+    font-family:var(--mono);font-size:11px;color:var(--dimmer);
+  }
+  .legend span{display:flex;align-items:center;gap:6px}
+  .swatch{width:8px;height:8px;border-radius:1.5px;background:var(--pass)}
+  .swatch.fail{background:var(--fail)}
+  .swatch.skip{background:var(--skip)}
+
+  .skeleton{
+    height:26px;width:7px;border-radius:1.5px;
+    background:var(--line);animation:breathe 1.4s ease-in-out infinite;
+  }
+  @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.85}}
+
+  @media (max-width:720px){
+    .wrap,.bar{padding-left:16px;padding-right:16px}
+    .team{grid-template-columns:1fr 60px;row-gap:10px}
+    .team .mini{grid-column:1/-1;order:3}
+    .runs-n{display:none}
+    .run-head{grid-template-columns:14px 1fr auto;row-gap:6px}
+    .when{grid-column:2/-1;text-align:left}
+    .readout{gap:24px}
+    .metric .n{font-size:27px}
+  }
+  @media (prefers-reduced-motion:reduce){
+    *{animation:none!important;transition:none!important}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <span class="logo">Test<span class="pulse">Pulse</span></span>
+    <span class="tagline">CI test results</span>
+    <span class="refreshed" id="stamp"></span>
+  </div>
+</header>
+
+<div class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Every test, newest run first</div>
+    <div class="strip" id="strip"></div>
+    <div class="readout" id="readout"></div>
+    <div class="legend">
+      <span><i class="swatch"></i> passed</span>
+      <span><i class="swatch fail"></i> failed</span>
+      <span><i class="swatch skip"></i> skipped</span>
+    </div>
+  </div>
+
+  <section>
+    <h2>Teams</h2>
+    <div id="teams"></div>
+  </section>
+
+  <section>
+    <h2>Runs</h2>
+    <div id="runs"></div>
+  </section>
+
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  var el = function (id) { return document.getElementById(id); };
+
+  function esc(s) {
+    return String(s == null ? "" : s).replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function pct(part, whole) {
+    if (!whole) return "—";
+    return (Math.round((part / whole) * 1000) / 10).toFixed(1) + "%";
+  }
+
+  function ago(iso) {
+    var t = new Date(iso);
+    if (isNaN(t)) return "";
+    var s = Math.floor((Date.now() - t.getTime()) / 1000);
+    if (s < 60) return "just now";
+    if (s < 3600) return Math.floor(s / 60) + "m ago";
+    if (s < 86400) return Math.floor(s / 3600) + "h ago";
+    if (s < 2592000) return Math.floor(s / 86400) + "d ago";
+    return t.toISOString().slice(0, 10);
+  }
+
+  function get(path) {
+    return fetch(path, { headers: { Accept: "application/json" } }).then(function (r) {
+      if (!r.ok) throw new Error(path + " returned " + r.status);
+      return r.json();
+    });
+  }
+
+  function ticks(passed, failed, skipped) {
+    var out = "";
+    var i;
+    for (i = 0; i < failed; i++) out += '<i class="tick fail"></i>';
+    for (i = 0; i < skipped; i++) out += '<i class="tick skip"></i>';
+    for (i = 0; i < passed; i++) out += '<i class="tick"></i>';
+    return out;
+  }
+
+  function loading() {
+    var s = "";
+    for (var i = 0; i < 46; i++) s += '<i class="skeleton"></i>';
+    el("strip").innerHTML = s;
+  }
+
+  function fail(msg, hint) {
+    el("strip").outerHTML =
+      '<div class="note err" id="strip"><strong>' + esc(msg) + "</strong>" + hint + "</div>";
+    el("readout").innerHTML = "";
+  }
+
+  // ---------- render ----------
+
+  function renderHero(runs) {
+    var total = 0, passed = 0, failed = 0;
+    runs.forEach(function (r) {
+      total += r.total || 0;
+      passed += r.passed || 0;
+      failed += r.failed || 0;
+    });
+    var skipped = Math.max(0, total - passed - failed);
+
+    var marks = runs
+      .map(function (r) {
+        var sk = Math.max(0, (r.total || 0) - (r.passed || 0) - (r.failed || 0));
+        return (
+          '<a class="tick-group" href="#run-' + esc(r.ingestion_id) + '">' +
+          ticks(r.passed || 0, r.failed || 0, sk) +
+          "</a>"
+        );
+      })
+      .join("");
+
+    el("strip").innerHTML = marks || '<span style="color:var(--dimmer);font-size:13px">No tests yet</span>';
+
+    el("readout").innerHTML =
+      '<div class="metric"><div class="n">' + total + '</div><div class="k">tests</div></div>' +
+      '<div class="metric ' + (failed ? "" : "ok") + '"><div class="n">' + pct(passed, total) +
+        '</div><div class="k">passing</div></div>' +
+      '<div class="metric ' + (failed ? "bad" : "") + '"><div class="n">' + failed +
+        '</div><div class="k">failed</div></div>' +
+      '<div class="metric"><div class="n">' + runs.length + '</div><div class="k">runs</div></div>';
+  }
+
+  function renderTeams(stats) {
+    if (!stats.length) {
+      el("teams").innerHTML = '<div class="note">No team data yet.</div>';
+      return;
+    }
+    el("teams").innerHTML = stats
+      .map(function (s) {
+        var t = s.total_tests || 0,
+          p = s.total_passed || 0,
+          f = s.total_failed || 0,
+          sk = Math.max(0, t - p - f);
+        return (
+          '<div class="team">' +
+          '<div class="team-name">' + esc(s.team) + "</div>" +
+          '<div class="mini">' + ticks(p, f, sk) + "</div>" +
+          '<div class="pct" style="color:' + (f ? "var(--fail)" : "var(--pass)") + '">' + pct(p, t) + "</div>" +
+          '<div class="runs-n">' + (s.run_count || 0) + " run" + (s.run_count === 1 ? "" : "s") + "</div>" +
+          "</div>"
+        );
+      })
+      .join("");
+  }
+
+  function renderRuns(runs) {
+    if (!runs.length) {
+      el("runs").innerHTML =
+        '<div class="note"><strong>Nothing ingested yet</strong>' +
+        "Post a result to the ingestor and it will appear here within seconds.</div>";
+      return;
+    }
+    el("runs").innerHTML = runs
+      .map(function (r) {
+        var f = r.failed || 0;
+        return (
+          '<div class="run" id="run-' + esc(r.ingestion_id) + '">' +
+          '<button class="run-head" data-id="' + esc(r.ingestion_id) + '" aria-expanded="false">' +
+          '<span class="caret">&#9656;</span>' +
+          "<span>" +
+          '<span class="run-id">' + esc(r.team) +
+          '<span class="slash">/</span><span class="proj">' + esc(r.project) + "</span></span>" +
+          '<span class="run-meta">' + esc((r.branch || "")) + "</span>" +
+          "</span>" +
+          '<span class="tally">' + (r.passed || 0) + "/" + (r.total || 0) +
+          (f ? ' <span class="bad">&#9679;</span>' : "") + "</span>" +
+          '<span class="when">' + esc(ago(r.timestamp)) + "</span>" +
+          "</button></div>"
+        );
+      })
+      .join("");
+  }
+
+  function renderCases(box, run) {
+    var cases = run.test_cases || [];
+    if (!cases.length) {
+      box.innerHTML = '<div class="cases" style="color:var(--dim);font-size:12.5px">No test cases recorded.</div>';
+      return;
+    }
+    var rows = cases
+      .map(function (c) {
+        var st = String(c.status || "").toLowerCase();
+        var bad = st === "fail" || st === "failed" || st === "error";
+        var sk = st === "skip" || st === "skipped";
+        return (
+          '<div class="case' + (bad ? " is-fail" : "") + '">' +
+          '<i class="dot' + (bad ? " fail" : sk ? " skip" : "") + '"></i>' +
+          '<span class="case-name">' + esc(c.name) +
+          (c.critical && bad ? '<span class="crit-tag">critical</span>' : "") +
+          "</span>" +
+          '<span class="ms">' + (c.duration_ms != null ? c.duration_ms + " ms" : "") + "</span>" +
+          "</div>"
+        );
+      })
+      .join("");
+    box.innerHTML = '<div class="cases">' + rows + "</div>";
+  }
+
+  // ---------- interaction ----------
+
+  el("runs").addEventListener("click", function (ev) {
+    var btn = ev.target.closest(".run-head");
+    if (!btn) return;
+    var card = btn.parentNode;
+    var open = card.classList.toggle("open");
+    btn.setAttribute("aria-expanded", open ? "true" : "false");
+
+    var box = card.querySelector(".cases-slot");
+    if (!open) {
+      if (box) box.innerHTML = "";
+      return;
+    }
+    if (!box) {
+      box = document.createElement("div");
+      box.className = "cases-slot";
+      card.appendChild(box);
+    }
+    box.innerHTML = '<div class="cases" style="color:var(--dimmer);font-size:12.5px">Loading…</div>';
+
+    get("/runs/" + encodeURIComponent(btn.dataset.id))
+      .then(function (run) { renderCases(box, run); })
+      .catch(function () {
+        box.innerHTML = '<div class="cases" style="color:var(--fail);font-size:12.5px">Could not load test cases.</div>';
+      });
+  });
+
+  // ---------- boot ----------
+
+  loading();
+
+  Promise.all([get("/runs"), get("/stats")])
+    .then(function (res) {
+      var runs = res[0] || [], stats = res[1] || [];
+      renderHero(runs);
+      renderTeams(stats);
+      renderRuns(runs);
+      el("stamp").textContent = new Date().toTimeString().slice(0, 5);
+    })
+    .catch(function (e) {
+      fail(
+        "Can't reach the API",
+        "The dashboard service is up (this page loaded) but <code>/runs</code> did not answer. " +
+          "Check the database connection: <code>docker logs testpulse-dashboard</code>.<br><br>" +
+          '<span style="color:var(--dimmer);font-size:12px">' + esc(e.message) + "</span>"
+      );
+      el("teams").innerHTML = '<div class="note">Unavailable.</div>';
+      el("runs").innerHTML = '<div class="note">Unavailable.</div>';
+    });
+})();
+</script>
+</body>
+</html>

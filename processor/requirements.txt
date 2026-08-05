@@ -1,0 +1,6 @@
+boto3
+pytest
+moto[all]
+psycopg2-binary
+python-dotenv
+aws-embedded-metrics

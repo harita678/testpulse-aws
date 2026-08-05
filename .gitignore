@@ -1,0 +1,47 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Secrets
+.env
+.env.local
+*.pem
+*.key
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+
+# Logs
+*.log
+
+# Terraform state files
+*.tfstate
+*.tfstate.*
+
+# Provider binaries (huge)
+.terraform/
+
+# Lock info
+.terraform.tfstate.lock.info
+
+# Crash logs
+crash.log
+
+# Sensitive .tfvars (uncomment if needed)
+*.auto.tfvars
+
+# Test data sql queries for dashboard (only for local)
+seed.sql
+
+sessionmanager-bundle.zip
+sessionmanager-bundle/
+# Lambda build artifacts (rebuildable deps)
+package/
+*.zip

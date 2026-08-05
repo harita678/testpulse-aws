@@ -1,0 +1,8 @@
+{
+  "Records": [
+    {
+      "messageId": "manual-test-001",
+      "body": "{\"ingestion_id\": \"11111111-2222-3333-4444-555555555555\", \"s3_bucket\": \"harita-testpulse-raw-2026\", \"s3_key\": \"manual-test/test-data.json\"}"
+    }
+  ]
+}

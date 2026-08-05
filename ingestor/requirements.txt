@@ -1,0 +1,8 @@
+fastapi
+uvicorn
+pydantic
+boto3
+pytest
+httpx
+moto[all]
+python-dotenv

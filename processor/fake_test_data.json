@@ -1,0 +1,13 @@
+{
+  "ingestion_id": "11111111-2222-3333-4444-555555555555",
+  "team": "callmetoremind",
+  "project": "test-project",
+  "commit_sha": "abc1234567890abcdef1234567890abcdef12345",
+  "branch": "main",
+  "ci_run_id": "manual-test-001",
+  "timestamp": "2026-06-24T17:00:00Z",
+  "tests": [
+    {"name": "test1", "status": "pass", "duration_ms": 100, "critical": false},
+    {"name": "test2", "status": "fail", "duration_ms": 50, "critical": true}
+  ]
+}
