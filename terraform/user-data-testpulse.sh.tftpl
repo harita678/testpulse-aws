@@ -42,9 +42,9 @@ dnf install -y git
 # ---------------------------------------------------------------------------
 # Section 5: Clone the repo (as ec2-user, not root)
 # ---------------------------------------------------------------------------
-echo "Cloning aws-lab repo..."
+echo "Cloning testpulse-aws repo..."
 cd /home/ec2-user
-sudo -u ec2-user git clone -b main https://github.com/harita678/aws-lab.git
+sudo -u ec2-user git clone -b main https://github.com/harita678/testpulse-aws.git
 
 # ---------------------------------------------------------------------------
 # Section 6: Build both container images
@@ -54,31 +54,31 @@ sudo -u ec2-user git clone -b main https://github.com/harita678/aws-lab.git
 
 # Image for Ingestor
 echo "Building Ingestor Image..."
-cd /home/ec2-user/aws-lab/05-testpulse/ingestor
+cd /home/ec2-user/testpulse-aws/ingestor
 docker build -t testpulse-ingestor .
 
 # Image for Dashboard
 echo "Building Dashboard Image..."
-cd /home/ec2-user/aws-lab/05-testpulse/dashboard
+cd /home/ec2-user/testpulse-aws/dashboard
 docker build -t testpulse-dashboard .
 
 # ---------------------------------------------------------------------------
 # Section 7a: Write .env file with config for Ingestor
 # ---------------------------------------------------------------------------
 echo "Writing Ingestor .env file..."
-cat > /home/ec2-user/aws-lab/05-testpulse/ingestor/.env << 'EOF'
+cat > /home/ec2-user/testpulse-aws/ingestor/.env << 'EOF'
 AWS_REGION=ca-central-1
 S3_BUCKET_NAME=harita-testpulse-raw-2026
 SQS_QUEUE_URL=https://sqs.ca-central-1.amazonaws.com/951125265513/harita-testpulse-ingestion-queue
 EOF
-chown ec2-user:ec2-user /home/ec2-user/aws-lab/05-testpulse/ingestor/.env
+chown ec2-user:ec2-user /home/ec2-user/testpulse-aws/ingestor/.env
 
 
 # ---------------------------------------------------------------------------
 # Section 7b: Write .env file with config for Dashbaord
 # ---------------------------------------------------------------------------
 echo "Writing Dashboard .env file..."
-cat > /home/ec2-user/aws-lab/05-testpulse/dashboard/.env << EOF
+cat > /home/ec2-user/testpulse-aws/dashboard/.env << EOF
 AWS_DEFAULT_REGION=ca-central-1
 DB_HOST=${db_host}
 DB_PORT=${db_port}
@@ -86,7 +86,7 @@ DB_NAME=${db_name}
 DB_USERNAME=${db_username}
 DB_SECRET_ARN=${db_secret_arn}
 EOF
-chown ec2-user:ec2-user /home/ec2-user/aws-lab/05-testpulse/dashboard/.env
+chown ec2-user:ec2-user /home/ec2-user/testpulse-aws/dashboard/.env
 
 # ---------------------------------------------------------------------------
 # Section 8a: Create systemd service file for Docker - Ingestor image; my app is containerized and the continer runs as a systemd service
@@ -105,7 +105,7 @@ RestartSec=10
 ExecStartPre=-/usr/bin/docker rm -f testpulse-ingestor
 ExecStart=/usr/bin/docker run --rm --name testpulse-ingestor \
   -p 8000:8000 \
-  --env-file /home/ec2-user/aws-lab/05-testpulse/ingestor/.env \
+  --env-file /home/ec2-user/testpulse-aws/ingestor/.env \
   testpulse-ingestor
 ExecStop=/usr/bin/docker stop testpulse-ingestor
 
@@ -129,7 +129,7 @@ RestartSec=10
 ExecStartPre=-/usr/bin/docker rm -f testpulse-dashboard
 ExecStart=/usr/bin/docker run --rm --name testpulse-dashboard \
   -p 8001:8001 \
-  --env-file /home/ec2-user/aws-lab/05-testpulse/dashboard/.env \
+  --env-file /home/ec2-user/testpulse-aws/dashboard/.env \
   testpulse-dashboard
 ExecStop=/usr/bin/docker stop testpulse-dashboard
 
