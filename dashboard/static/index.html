@@ -6,264 +6,239 @@
 <title>TestPulse</title>
 <style>
   :root{
-    --bg:#0E141B;
-    --panel:#151D26;
-    --panel-2:#1B2430;
-    --line:#24303D;
-    --text:#DDE5ED;
-    --dim:#7C8DA0;
-    --dimmer:#4E5D6D;
-    --pass:#5FB98B;
-    --fail:#E86A5A;
-    --skip:#D9A441;
-    --steel:#6B9DC4;
-
+    --primary:#4a6fa5;
+    --primary-dark:#2c4a73;
+    --bg:#f4f6fa;
+    --card:#ffffff;
+    --line:#e2e8f0;
+    --line-soft:#eef2f7;
+    --text:#1f2a3a;
+    --dim:#5f6f85;
+    --dimmer:#9aa8bd;
+    --pass:#3faa6d;
+    --pass-soft:#e6f6ee;
+    --fail:#e0574a;
+    --fail-soft:#fdecea;
+    --skip:#d69a2d;
+    --skip-soft:#fbf1dd;
     --mono: ui-monospace, "SF Mono", SFMono-Regular, "JetBrains Mono", Menlo, Consolas, monospace;
     --sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
   }
-
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
   body{
-    background:var(--bg);
-    color:var(--text);
-    font-family:var(--sans);
-    font-size:15px;
-    line-height:1.5;
+    background:var(--bg);color:var(--text);
+    font-family:var(--sans);font-size:15px;line-height:1.5;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1080px;margin:0 auto;padding:0 24px 80px}
+  .wrap{max-width:1040px;margin:0 auto;padding:0 22px 80px}
 
-  /* ---------- header ---------- */
-  header{
-    border-bottom:1px solid var(--line);
-    margin-bottom:36px;
+  /* ---------- hero ---------- */
+  .hero{
+    background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color:#fff;padding:34px 24px 30px;text-align:center;
+    box-shadow:0 2px 14px rgba(44,74,115,.18);
   }
-  .bar{
-    max-width:1080px;margin:0 auto;padding:18px 24px;
-    display:flex;align-items:baseline;gap:14px;
-  }
-  .logo{
-    font-family:var(--mono);
-    font-size:15px;font-weight:600;letter-spacing:.14em;
+  .hero .logo{
+    font-family:var(--mono);font-size:16px;font-weight:600;letter-spacing:.16em;
     text-transform:uppercase;
   }
-  .logo .pulse{color:var(--pass)}
-  .tagline{color:var(--dimmer);font-size:12.5px}
-  .refreshed{margin-left:auto;color:var(--dimmer);font-size:12px;font-family:var(--mono)}
+  .hero .logo .pulse{color:#bfe6cf}
+  .hero .tagline{color:rgba(255,255,255,.7);font-size:12.5px;margin-top:5px;letter-spacing:.04em}
 
-  /* ---------- hero: the strip ---------- */
-  .hero{margin-bottom:44px}
-  .eyebrow{
-    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--dimmer);margin-bottom:14px;
+  /* metrics inside hero */
+  .readout{
+    display:flex;justify-content:center;flex-wrap:wrap;gap:34px;margin-top:24px;
   }
+  .metric .n{
+    font-family:var(--mono);font-size:32px;font-weight:600;line-height:1;
+    font-variant-numeric:tabular-nums;letter-spacing:-.02em;
+  }
+  .metric .k{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;
+    text-transform:uppercase;color:rgba(255,255,255,.6);margin-top:7px;
+  }
+  .metric.ok .n{color:#bfe6cf}
+  .metric.bad .n{color:#ffb9b0}
+
+  /* engaging tick strip */
+  .stripwrap{max-width:1040px;margin:22px auto 0;padding:0 22px}
+  .eyebrow{
+    font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dimmer);margin-bottom:10px;
+    display:flex;align-items:center;gap:8px;
+  }
+  .eyebrow .refreshed{margin-left:auto;color:var(--dimmer)}
   .strip{
-    display:flex;flex-wrap:wrap;gap:3px;
-    padding:20px;background:var(--panel);
-    border:1px solid var(--line);border-radius:4px;
-    min-height:78px;align-content:flex-start;
+    display:flex;flex-wrap:wrap;gap:3px;padding:16px;
+    background:var(--card);border:1px solid var(--line);border-radius:8px;
+    min-height:60px;align-content:flex-start;
+    box-shadow:0 1px 3px rgba(31,42,58,.04);
   }
   .tick{
-    width:7px;height:26px;border-radius:1.5px;
-    background:var(--pass);flex:0 0 auto;
-    transition:transform .12s ease;
+    width:8px;height:28px;border-radius:2px;background:var(--pass);flex:0 0 auto;
+    transition:transform .12s ease, box-shadow .12s ease;
   }
   .tick.fail{background:var(--fail)}
   .tick.skip{background:var(--skip)}
-  .tick.crit{box-shadow:inset 0 0 0 1.5px var(--bg), 0 0 0 1.5px var(--fail)}
-  a.tick:hover,a.tick:focus-visible{transform:scaleY(1.18);outline:none}
-  a.tick:focus-visible{box-shadow:0 0 0 2px var(--steel)}
-
-  .readout{
-    display:flex;flex-wrap:wrap;gap:34px;
-    margin-top:20px;align-items:flex-end;
+  a.tick-group{display:inline-flex;gap:3px;text-decoration:none}
+  a.tick-group:hover .tick{transform:scaleY(1.15)}
+  a.tick-group:focus-visible{outline:2px solid var(--primary);outline-offset:2px;border-radius:2px}
+  .legend{
+    display:flex;gap:18px;flex-wrap:wrap;margin-top:12px;
+    font-family:var(--mono);font-size:10.5px;color:var(--dim);
   }
-  .metric .n{
-    font-family:var(--mono);font-size:34px;font-weight:600;
-    line-height:1;font-variant-numeric:tabular-nums;letter-spacing:-.02em;
-  }
-  .metric .k{
-    font-family:var(--mono);font-size:11px;letter-spacing:.14em;
-    text-transform:uppercase;color:var(--dim);margin-top:8px;
-  }
-  .metric.ok .n{color:var(--pass)}
-  .metric.bad .n{color:var(--fail)}
+  .legend span{display:flex;align-items:center;gap:6px}
+  .swatch{width:9px;height:9px;border-radius:2px;background:var(--pass)}
+  .swatch.fail{background:var(--fail)}
+  .swatch.skip{background:var(--skip)}
 
   /* ---------- sections ---------- */
-  section{margin-bottom:44px}
+  section{margin-top:38px}
   h2{
-    font-family:var(--mono);font-size:11px;letter-spacing:.18em;
-    text-transform:uppercase;color:var(--dimmer);
-    font-weight:600;margin:0 0 14px;
+    font-family:var(--mono);font-size:11px;letter-spacing:.16em;
+    text-transform:uppercase;color:var(--dimmer);font-weight:600;margin:0 0 14px;
   }
 
-  /* ---------- teams ---------- */
-  .team{
-    display:grid;
-    grid-template-columns:150px 1fr 62px 74px;
-    gap:18px;align-items:center;
-    padding:14px 18px;
-    border:1px solid var(--line);border-top:none;
-    background:var(--panel);
+  /* ---------- team block ---------- */
+  .team-block{
+    background:var(--card);border:1px solid var(--line);border-radius:10px;
+    margin-bottom:18px;overflow:hidden;box-shadow:0 1px 3px rgba(31,42,58,.05);
   }
-  .team:first-of-type{border-top:1px solid var(--line);border-radius:4px 4px 0 0}
-  .team:last-of-type{border-radius:0 0 4px 4px}
-  .team-name{font-family:var(--mono);font-size:13.5px;font-weight:600}
-  .mini{display:flex;gap:2px;flex-wrap:wrap}
-  .mini .tick{width:5px;height:15px}
-  .pct{
-    font-family:var(--mono);font-size:14px;text-align:right;
-    font-variant-numeric:tabular-nums;
+  .team-header{
+    display:flex;align-items:center;gap:14px;
+    padding:15px 20px;background:linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    color:#fff;
   }
-  .runs-n{
-    font-family:var(--mono);font-size:11.5px;color:var(--dim);
-    text-align:right;
+  .team-header .tname{font-family:var(--mono);font-size:15px;font-weight:600;letter-spacing:.02em}
+  .team-header .tmeta{
+    margin-left:auto;font-family:var(--mono);font-size:11.5px;
+    color:rgba(255,255,255,.82);display:flex;gap:16px;align-items:center;
   }
+  .team-header .tpct{font-weight:600}
 
-  /* ---------- runs ---------- */
-  .run{border:1px solid var(--line);border-top:none;background:var(--panel)}
-  .run:first-of-type{border-top:1px solid var(--line);border-radius:4px 4px 0 0}
-  .run:last-of-type{border-radius:0 0 4px 4px}
+  /* ---------- project ---------- */
+  .project{border-top:1px solid var(--line-soft)}
+  .project:first-child{border-top:none}
+  .project-header{
+    display:flex;align-items:center;gap:10px;
+    padding:12px 20px;background:#fafbfd;
+  }
+  .project-header .pname{font-family:var(--mono);font-size:13px;font-weight:600;color:var(--primary-dark)}
+  .project-header .picon{color:var(--dimmer);font-size:12px}
+  .project-header .pmeta{margin-left:auto;font-family:var(--mono);font-size:11px;color:var(--dim)}
 
+  /* ---------- run row ---------- */
+  .run{border-top:1px solid var(--line-soft)}
   .run-head{
-    display:grid;
-    grid-template-columns:14px 1fr 90px 108px;
-    gap:16px;align-items:center;
-    width:100%;padding:14px 18px;
-    background:none;border:none;color:inherit;
+    display:grid;grid-template-columns:16px 96px 1fr auto;
+    gap:14px;align-items:center;width:100%;
+    padding:12px 20px 12px 34px;background:none;border:none;color:inherit;
     font:inherit;text-align:left;cursor:pointer;
   }
-  .run-head:hover{background:var(--panel-2)}
-  .run-head:focus-visible{outline:2px solid var(--steel);outline-offset:-2px}
+  .run-head:hover{background:var(--line-soft)}
+  .run-head:focus-visible{outline:2px solid var(--primary);outline-offset:-2px}
   .caret{
     font-family:var(--mono);color:var(--dimmer);font-size:11px;
     transition:transform .15s ease;display:inline-block;
   }
   .run.open .caret{transform:rotate(90deg)}
-  .run-id{font-family:var(--mono);font-size:13.5px}
-  .run-id .slash{color:var(--dimmer);margin:0 2px}
-  .run-id .proj{color:var(--dim)}
-  .run-meta{
-    font-family:var(--mono);font-size:11.5px;color:var(--dimmer);
-    margin-top:3px;
+  .run-date{font-family:var(--mono);font-size:12.5px;color:var(--dim);font-variant-numeric:tabular-nums}
+  .run-summary{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .pill{
+    font-family:var(--mono);font-size:11px;padding:2px 9px;border-radius:20px;
+    font-variant-numeric:tabular-nums;font-weight:600;
   }
-  .tally{
-    font-family:var(--mono);font-size:13px;text-align:right;
-    font-variant-numeric:tabular-nums;
-  }
-  .tally .bad{color:var(--fail)}
-  .when{
-    font-family:var(--mono);font-size:11.5px;color:var(--dim);
-    text-align:right;
-  }
+  .pill.total{background:#eef2f7;color:var(--dim)}
+  .pill.pass{background:var(--pass-soft);color:var(--pass)}
+  .pill.fail{background:var(--fail-soft);color:var(--fail)}
+  .pill.skip{background:var(--skip-soft);color:var(--skip)}
+  .run-when{font-family:var(--mono);font-size:11px;color:var(--dimmer);text-align:right}
 
-  .cases{
-    border-top:1px solid var(--line);
-    padding:6px 18px 14px;background:var(--panel-2);
-  }
+  /* mini result bar per run */
+  .mini{display:flex;gap:2px;flex-wrap:wrap;max-width:120px}
+  .mini .tick{width:5px;height:14px}
+
+  /* ---------- test cases ---------- */
+  .cases{padding:4px 20px 14px 34px;background:#fafbfd;border-top:1px solid var(--line-soft)}
   .case{
-    display:grid;grid-template-columns:8px 1fr auto;
-    gap:12px;align-items:center;
-    padding:7px 0;border-bottom:1px solid var(--line);
+    display:grid;grid-template-columns:9px 1fr auto;gap:12px;align-items:center;
+    padding:8px 0;border-bottom:1px solid var(--line-soft);
     font-family:var(--mono);font-size:12.5px;
   }
   .case:last-child{border-bottom:none}
-  .dot{width:8px;height:8px;border-radius:50%;background:var(--pass)}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--pass)}
   .dot.fail{background:var(--fail)}
   .dot.skip{background:var(--skip)}
-  .case-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .case-name{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:var(--text)}
   .case.is-fail .case-name{color:var(--fail)}
   .crit-tag{
-    font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;
-    color:var(--fail);border:1px solid var(--fail);
-    border-radius:2px;padding:1px 5px;margin-left:8px;vertical-align:1px;
+    font-size:9px;letter-spacing:.08em;text-transform:uppercase;color:var(--fail);
+    border:1px solid var(--fail);border-radius:3px;padding:1px 5px;margin-left:8px;vertical-align:1px;
   }
   .ms{color:var(--dim);font-variant-numeric:tabular-nums}
 
   /* ---------- states ---------- */
   .note{
-    border:1px solid var(--line);border-radius:4px;
-    background:var(--panel);padding:26px 20px;
-    color:var(--dim);font-size:13.5px;
+    border:1px solid var(--line);border-radius:8px;background:var(--card);
+    padding:26px 20px;color:var(--dim);font-size:13.5px;
+    box-shadow:0 1px 3px rgba(31,42,58,.04);
   }
   .note strong{display:block;color:var(--text);margin-bottom:5px;font-size:14px}
   .note code{
-    font-family:var(--mono);font-size:12.5px;
-    color:var(--steel);background:var(--bg);
-    padding:1px 5px;border-radius:2px;
+    font-family:var(--mono);font-size:12.5px;color:var(--primary-dark);
+    background:var(--bg);padding:1px 5px;border-radius:3px;
   }
-  .note.err{border-color:#4A2A28}
-
-  .legend{
-    display:flex;gap:18px;flex-wrap:wrap;margin-top:14px;
-    font-family:var(--mono);font-size:11px;color:var(--dimmer);
-  }
-  .legend span{display:flex;align-items:center;gap:6px}
-  .swatch{width:8px;height:8px;border-radius:1.5px;background:var(--pass)}
-  .swatch.fail{background:var(--fail)}
-  .swatch.skip{background:var(--skip)}
-
+  .note.err{border-color:#f2c4bf}
   .skeleton{
-    height:26px;width:7px;border-radius:1.5px;
-    background:var(--line);animation:breathe 1.4s ease-in-out infinite;
+    height:28px;width:8px;border-radius:2px;background:var(--line);
+    animation:breathe 1.4s ease-in-out infinite;
   }
-  @keyframes breathe{0%,100%{opacity:.35}50%{opacity:.85}}
+  @keyframes breathe{0%,100%{opacity:.4}50%{opacity:.9}}
 
   @media (max-width:720px){
-    .wrap,.bar{padding-left:16px;padding-right:16px}
-    .team{grid-template-columns:1fr 60px;row-gap:10px}
-    .team .mini{grid-column:1/-1;order:3}
-    .runs-n{display:none}
-    .run-head{grid-template-columns:14px 1fr auto;row-gap:6px}
-    .when{grid-column:2/-1;text-align:left}
-    .readout{gap:24px}
-    .metric .n{font-size:27px}
+    .wrap,.stripwrap{padding-left:15px;padding-right:15px}
+    .run-head{grid-template-columns:16px 1fr auto;row-gap:6px}
+    .run-date{grid-column:2/-1;order:3}
+    .run-when{display:none}
+    .readout{gap:22px}
+    .metric .n{font-size:26px}
+    .team-header .tmeta{gap:10px}
   }
-  @media (prefers-reduced-motion:reduce){
-    *{animation:none!important;transition:none!important}
-  }
+  @media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
 </style>
 </head>
 <body>
 
-<header>
-  <div class="bar">
-    <span class="logo">Test<span class="pulse">Pulse</span></span>
-    <span class="tagline">CI test results</span>
+<div class="hero">
+  <div class="logo">Test<span class="pulse">Pulse</span></div>
+  <div class="tagline">Test health across every team &amp; project</div>
+  <div class="readout" id="readout"></div>
+</div>
+
+<div class="stripwrap">
+  <div class="eyebrow">
+    <span>Every test · newest run first</span>
     <span class="refreshed" id="stamp"></span>
   </div>
-</header>
+  <div class="strip" id="strip"></div>
+  <div class="legend">
+    <span><i class="swatch"></i> passed</span>
+    <span><i class="swatch fail"></i> failed</span>
+    <span><i class="swatch skip"></i> skipped</span>
+  </div>
+</div>
 
 <div class="wrap">
-
-  <div class="hero">
-    <div class="eyebrow">Every test, newest run first</div>
-    <div class="strip" id="strip"></div>
-    <div class="readout" id="readout"></div>
-    <div class="legend">
-      <span><i class="swatch"></i> passed</span>
-      <span><i class="swatch fail"></i> failed</span>
-      <span><i class="swatch skip"></i> skipped</span>
-    </div>
-  </div>
-
   <section>
-    <h2>Teams</h2>
+    <h2>Teams &amp; Projects</h2>
     <div id="teams"></div>
   </section>
-
-  <section>
-    <h2>Runs</h2>
-    <div id="runs"></div>
-  </section>
-
 </div>
 
 <script>
 (function () {
   "use strict";
-
   var el = function (id) { return document.getElementById(id); };
 
   function esc(s) {
@@ -271,12 +246,15 @@
       return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
     });
   }
-
   function pct(part, whole) {
     if (!whole) return "—";
     return (Math.round((part / whole) * 1000) / 10).toFixed(1) + "%";
   }
-
+  function dateOnly(iso) {
+    var t = new Date(iso);
+    if (isNaN(t)) return String(iso || "").slice(0, 10);
+    return t.toISOString().slice(0, 10);
+  }
   function ago(iso) {
     var t = new Date(iso);
     if (isNaN(t)) return "";
@@ -287,165 +265,165 @@
     if (s < 2592000) return Math.floor(s / 86400) + "d ago";
     return t.toISOString().slice(0, 10);
   }
-
   function get(path) {
     return fetch(path, { headers: { Accept: "application/json" } }).then(function (r) {
       if (!r.ok) throw new Error(path + " returned " + r.status);
       return r.json();
     });
   }
-
   function ticks(passed, failed, skipped) {
-    var out = "";
-    var i;
+    var out = "", i;
     for (i = 0; i < failed; i++) out += '<i class="tick fail"></i>';
     for (i = 0; i < skipped; i++) out += '<i class="tick skip"></i>';
     for (i = 0; i < passed; i++) out += '<i class="tick"></i>';
     return out;
   }
-
   function loading() {
     var s = "";
     for (var i = 0; i < 46; i++) s += '<i class="skeleton"></i>';
     el("strip").innerHTML = s;
   }
 
-  function fail(msg, hint) {
-    el("strip").outerHTML =
-      '<div class="note err" id="strip"><strong>' + esc(msg) + "</strong>" + hint + "</div>";
-    el("readout").innerHTML = "";
-  }
-
-  // ---------- render ----------
-
+  // ---------- hero + strip ----------
   function renderHero(runs) {
     var total = 0, passed = 0, failed = 0;
     runs.forEach(function (r) {
-      total += r.total || 0;
-      passed += r.passed || 0;
-      failed += r.failed || 0;
+      total += r.total || 0; passed += r.passed || 0; failed += r.failed || 0;
     });
-    var skipped = Math.max(0, total - passed - failed);
-
-    var marks = runs
-      .map(function (r) {
-        var sk = Math.max(0, (r.total || 0) - (r.passed || 0) - (r.failed || 0));
-        return (
-          '<a class="tick-group" href="#run-' + esc(r.ingestion_id) + '">' +
-          ticks(r.passed || 0, r.failed || 0, sk) +
-          "</a>"
-        );
-      })
-      .join("");
-
-    el("strip").innerHTML = marks || '<span style="color:var(--dimmer);font-size:13px">No tests yet</span>';
+    var marks = runs.map(function (r) {
+      var sk = Math.max(0, (r.total || 0) - (r.passed || 0) - (r.failed || 0));
+      return '<a class="tick-group" href="#run-' + esc(r.ingestion_id) + '" title="' +
+        esc(r.team) + " / " + esc(r.project) + '">' + ticks(r.passed || 0, r.failed || 0, sk) + "</a>";
+    }).join("");
+    el("strip").innerHTML = marks || '<span style="color:var(--dimmer);font-size:13px">No tests yet — post a run to the ingestor.</span>';
 
     el("readout").innerHTML =
       '<div class="metric"><div class="n">' + total + '</div><div class="k">tests</div></div>' +
-      '<div class="metric ' + (failed ? "" : "ok") + '"><div class="n">' + pct(passed, total) +
-        '</div><div class="k">passing</div></div>' +
-      '<div class="metric ' + (failed ? "bad" : "") + '"><div class="n">' + failed +
-        '</div><div class="k">failed</div></div>' +
+      '<div class="metric ' + (failed ? "" : "ok") + '"><div class="n">' + pct(passed, total) + '</div><div class="k">passing</div></div>' +
+      '<div class="metric ' + (failed ? "bad" : "") + '"><div class="n">' + failed + '</div><div class="k">failed</div></div>' +
       '<div class="metric"><div class="n">' + runs.length + '</div><div class="k">runs</div></div>';
   }
 
-  function renderTeams(stats) {
-    if (!stats.length) {
-      el("teams").innerHTML = '<div class="note">No team data yet.</div>';
-      return;
-    }
-    el("teams").innerHTML = stats
-      .map(function (s) {
-        var t = s.total_tests || 0,
-          p = s.total_passed || 0,
-          f = s.total_failed || 0,
-          sk = Math.max(0, t - p - f);
-        return (
-          '<div class="team">' +
-          '<div class="team-name">' + esc(s.team) + "</div>" +
-          '<div class="mini">' + ticks(p, f, sk) + "</div>" +
-          '<div class="pct" style="color:' + (f ? "var(--fail)" : "var(--pass)") + '">' + pct(p, t) + "</div>" +
-          '<div class="runs-n">' + (s.run_count || 0) + " run" + (s.run_count === 1 ? "" : "s") + "</div>" +
-          "</div>"
-        );
-      })
-      .join("");
+  // ---------- nested Team -> Project -> Runs ----------
+  function groupData(runs) {
+    // teams -> projects -> [runs]
+    var teams = {};
+    runs.forEach(function (r) {
+      var tn = r.team || "(unknown team)";
+      var pn = r.project || "(unknown project)";
+      if (!teams[tn]) teams[tn] = { name: tn, projects: {}, total: 0, passed: 0, failed: 0, runs: 0 };
+      var T = teams[tn];
+      if (!T.projects[pn]) T.projects[pn] = { name: pn, runs: [], total: 0, passed: 0, failed: 0 };
+      var P = T.projects[pn];
+      P.runs.push(r);
+      var t = r.total || 0, p = r.passed || 0, f = r.failed || 0;
+      P.total += t; P.passed += p; P.failed += f;
+      T.total += t; T.passed += p; T.failed += f; T.runs += 1;
+    });
+    // to sorted arrays
+    return Object.keys(teams).sort().map(function (tn) {
+      var T = teams[tn];
+      T.projectList = Object.keys(T.projects).sort().map(function (pn) {
+        var P = T.projects[pn];
+        // newest run first
+        P.runs.sort(function (a, b) { return new Date(b.timestamp) - new Date(a.timestamp); });
+        return P;
+      });
+      return T;
+    });
   }
 
-  function renderRuns(runs) {
+  function renderTeams(runs) {
     if (!runs.length) {
-      el("runs").innerHTML =
+      el("teams").innerHTML =
         '<div class="note"><strong>Nothing ingested yet</strong>' +
         "Post a result to the ingestor and it will appear here within seconds.</div>";
       return;
     }
-    el("runs").innerHTML = runs
-      .map(function (r) {
-        var f = r.failed || 0;
+    var data = groupData(runs);
+    el("teams").innerHTML = data.map(function (T) {
+      var projects = T.projectList.map(function (P) {
+        var runsHtml = P.runs.map(function (r) {
+          var t = r.total || 0, p = r.passed || 0, f = r.failed || 0;
+          var sk = Math.max(0, t - p - f);
+          return (
+            '<div class="run" id="run-' + esc(r.ingestion_id) + '">' +
+            '<button class="run-head" data-id="' + esc(r.ingestion_id) + '" aria-expanded="false">' +
+            '<span class="caret">&#9656;</span>' +
+            '<span class="run-date">' + esc(dateOnly(r.timestamp)) + '</span>' +
+            '<span class="run-summary">' +
+              '<span class="pill total">' + t + ' total</span>' +
+              '<span class="pill pass">' + p + ' pass</span>' +
+              (f ? '<span class="pill fail">' + f + ' fail</span>' : '') +
+              (sk ? '<span class="pill skip">' + sk + ' skip</span>' : '') +
+            '</span>' +
+            '<span class="run-when">' + esc(ago(r.timestamp)) + '</span>' +
+            '</button></div>'
+          );
+        }).join("");
         return (
-          '<div class="run" id="run-' + esc(r.ingestion_id) + '">' +
-          '<button class="run-head" data-id="' + esc(r.ingestion_id) + '" aria-expanded="false">' +
-          '<span class="caret">&#9656;</span>' +
-          "<span>" +
-          '<span class="run-id">' + esc(r.team) +
-          '<span class="slash">/</span><span class="proj">' + esc(r.project) + "</span></span>" +
-          '<span class="run-meta">' + esc((r.branch || "")) + "</span>" +
-          "</span>" +
-          '<span class="tally">' + (r.passed || 0) + "/" + (r.total || 0) +
-          (f ? ' <span class="bad">&#9679;</span>' : "") + "</span>" +
-          '<span class="when">' + esc(ago(r.timestamp)) + "</span>" +
-          "</button></div>"
+          '<div class="project">' +
+          '<div class="project-header">' +
+            '<span class="picon">&#9702;</span>' +
+            '<span class="pname">' + esc(P.name) + '</span>' +
+            '<span class="pmeta">' + P.runs.length + ' run' + (P.runs.length === 1 ? '' : 's') +
+              ' · ' + pct(P.passed, P.total) + ' passing</span>' +
+          '</div>' + runsHtml + '</div>'
         );
-      })
-      .join("");
+      }).join("");
+
+      return (
+        '<div class="team-block">' +
+        '<div class="team-header">' +
+          '<span class="tname">' + esc(T.name) + '</span>' +
+          '<span class="tmeta">' +
+            '<span>' + Object.keys(T.projects).length + ' project' + (Object.keys(T.projects).length === 1 ? '' : 's') + '</span>' +
+            '<span>' + T.runs + ' run' + (T.runs === 1 ? '' : 's') + '</span>' +
+            '<span class="tpct">' + pct(T.passed, T.total) + ' passing</span>' +
+          '</span>' +
+        '</div>' + projects + '</div>'
+      );
+    }).join("");
   }
 
+  // ---------- expand a run to show its test cases ----------
   function renderCases(box, run) {
     var cases = run.test_cases || [];
     if (!cases.length) {
       box.innerHTML = '<div class="cases" style="color:var(--dim);font-size:12.5px">No test cases recorded.</div>';
       return;
     }
-    var rows = cases
-      .map(function (c) {
-        var st = String(c.status || "").toLowerCase();
-        var bad = st === "fail" || st === "failed" || st === "error";
-        var sk = st === "skip" || st === "skipped";
-        return (
-          '<div class="case' + (bad ? " is-fail" : "") + '">' +
-          '<i class="dot' + (bad ? " fail" : sk ? " skip" : "") + '"></i>' +
-          '<span class="case-name">' + esc(c.name) +
-          (c.critical && bad ? '<span class="crit-tag">critical</span>' : "") +
-          "</span>" +
-          '<span class="ms">' + (c.duration_ms != null ? c.duration_ms + " ms" : "") + "</span>" +
-          "</div>"
-        );
-      })
-      .join("");
+    var rows = cases.map(function (c) {
+      var st = String(c.status || "").toLowerCase();
+      var bad = st === "fail" || st === "failed" || st === "error";
+      var sk = st === "skip" || st === "skipped";
+      return (
+        '<div class="case' + (bad ? " is-fail" : "") + '">' +
+        '<i class="dot' + (bad ? " fail" : sk ? " skip" : "") + '"></i>' +
+        '<span class="case-name">' + esc(c.name) +
+        (c.critical && bad ? '<span class="crit-tag">critical</span>' : "") + '</span>' +
+        '<span class="ms">' + (c.duration_ms != null ? c.duration_ms + " ms" : "") + '</span>' +
+        '</div>'
+      );
+    }).join("");
     box.innerHTML = '<div class="cases">' + rows + "</div>";
   }
 
-  // ---------- interaction ----------
-
-  el("runs").addEventListener("click", function (ev) {
+  // expand/collapse (event delegation on the whole teams container)
+  el("teams").addEventListener("click", function (ev) {
     var btn = ev.target.closest(".run-head");
     if (!btn) return;
     var card = btn.parentNode;
     var open = card.classList.toggle("open");
     btn.setAttribute("aria-expanded", open ? "true" : "false");
-
     var box = card.querySelector(".cases-slot");
-    if (!open) {
-      if (box) box.innerHTML = "";
-      return;
-    }
+    if (!open) { if (box) box.innerHTML = ""; return; }
     if (!box) {
       box = document.createElement("div");
       box.className = "cases-slot";
       card.appendChild(box);
     }
     box.innerHTML = '<div class="cases" style="color:var(--dimmer);font-size:12.5px">Loading…</div>';
-
     get("/runs/" + encodeURIComponent(btn.dataset.id))
       .then(function (run) { renderCases(box, run); })
       .catch(function () {
@@ -454,26 +432,22 @@
   });
 
   // ---------- boot ----------
-
   loading();
-
-  Promise.all([get("/runs"), get("/stats")])
-    .then(function (res) {
-      var runs = res[0] || [], stats = res[1] || [];
+  get("/runs")
+    .then(function (runs) {
+      runs = runs || [];
       renderHero(runs);
-      renderTeams(stats);
-      renderRuns(runs);
-      el("stamp").textContent = new Date().toTimeString().slice(0, 5);
+      renderTeams(runs);
+      el("stamp").textContent = "updated " + new Date().toTimeString().slice(0, 5);
     })
     .catch(function (e) {
-      fail(
-        "Can't reach the API",
-        "The dashboard service is up (this page loaded) but <code>/runs</code> did not answer. " +
-          "Check the database connection: <code>docker logs testpulse-dashboard</code>.<br><br>" +
-          '<span style="color:var(--dimmer);font-size:12px">' + esc(e.message) + "</span>"
-      );
+      el("strip").outerHTML =
+        '<div class="note err" id="strip"><strong>Can\'t reach the API</strong>' +
+        "The dashboard page loaded, but <code>/runs</code> did not answer. " +
+        "Check the database connection: <code>docker logs testpulse-dashboard</code>.<br><br>" +
+        '<span style="color:var(--dimmer);font-size:12px">' + esc(e.message) + "</span></div>";
+      el("readout").innerHTML = "";
       el("teams").innerHTML = '<div class="note">Unavailable.</div>';
-      el("runs").innerHTML = '<div class="note">Unavailable.</div>';
     });
 })();
 </script>
