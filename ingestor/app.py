@@ -7,6 +7,7 @@ from http import HTTPStatus
 import json
 
 from fastapi import FastAPI, status, Header, HTTPException, Depends
+import os
 from models import TestRunRequest, TestRunResponse
 from aws_clients import get_sqs_client, get_aws_config, get_s3_client
 
