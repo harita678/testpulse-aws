@@ -22,6 +22,7 @@ resource "aws_instance" "ingestor" {
     db_name     = var.DB_NAME
     db_username = var.DB_USERNAME
     db_secret_arn = aws_secretsmanager_secret.db_password.arn
+    testpulse_api_key = var.TESTPULSE_API_KEY
 
   })
 

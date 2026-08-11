@@ -68,3 +68,8 @@ variable "alert_emails" {
   description = "Email addresses to receive TestPulse alerts"
   type        = set(string)
 }
+variable "TESTPULSE_API_KEY" {
+  description = "API key that clients must send in the X-API-Key header to post results"
+  type        = string
+  sensitive   = true
+}

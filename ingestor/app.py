@@ -6,7 +6,7 @@ from uuid import uuid4
 from http import HTTPStatus
 import json
 
-from fastapi import FastAPI, status
+from fastapi import FastAPI, status, Header, HTTPException, Depends
 from models import TestRunRequest, TestRunResponse
 from aws_clients import get_sqs_client, get_aws_config, get_s3_client
 
@@ -17,7 +17,10 @@ app = FastAPI(
     description="Receives test results from CI pipelines"
     )
 
-
+def verify_api_key(x_api_key: str = Header(None)):
+    expected = os.environ.get("TESTPULSE_API_KEY")
+    if not expected or x_api_key != expected:
+        raise HTTPException(status_code=401, detail="Invalid or missing API key")
 
 @app.get("/health")
 def health_check():
@@ -25,7 +28,7 @@ def health_check():
         "status": "healthy"
     }
 
-@app.post("/results/json", status_code=status.HTTP_202_ACCEPTED, response_model=TestRunResponse)
+@app.post("/results/json", status_code=status.HTTP_202_ACCEPTED, response_model=TestRunResponse, dependencies=[Depends(verify_api_key)])
 def create_test_run(test_run: TestRunRequest):
     config = get_aws_config()
     s3_client = get_s3_client()

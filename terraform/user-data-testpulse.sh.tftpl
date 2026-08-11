@@ -66,10 +66,11 @@ docker build -t testpulse-dashboard .
 # Section 7a: Write .env file with config for Ingestor
 # ---------------------------------------------------------------------------
 echo "Writing Ingestor .env file..."
-cat > /home/ec2-user/testpulse-aws/ingestor/.env << 'EOF'
+cat > /home/ec2-user/testpulse-aws/ingestor/.env << EOF
 AWS_REGION=ca-central-1
 S3_BUCKET_NAME=harita-testpulse-raw-2026
 SQS_QUEUE_URL=https://sqs.ca-central-1.amazonaws.com/951125265513/harita-testpulse-ingestion-queue
+TESTPULSE_API_KEY=${testpulse_api_key}
 EOF
 chown ec2-user:ec2-user /home/ec2-user/testpulse-aws/ingestor/.env
 
