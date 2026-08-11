@@ -8,7 +8,7 @@ from moto import mock_aws
 from app import app
 
 client = TestClient(app)
-
+AUTH_HEADER = {"X-API-Key": "test-key-123"}
 
 @pytest.fixture
 def aws_env(monkeypatch):
@@ -24,6 +24,8 @@ def aws_env(monkeypatch):
         "AWS_DEFAULT_REGION": "ca-central-1",
         "AWS_REGION": "ca-central-1",
         "S3_BUCKET_NAME": "test-bucket",
+        "TESTPULSE_API_KEY": "test-key-123"
+        
     }
     for key, value in env.items():
         monkeypatch.setenv(key, value)
@@ -67,7 +69,7 @@ def test_post_results_json_returns_202_on_valid_payload(aws_env, monkeypatch):
         ],
     }
 
-    response = client.post("/results/json", json=payload)
+    response = client.post("/results/json", json=payload, headers=AUTH_HEADER)
 
     assert response.status_code == 202
     data = response.json()
@@ -111,6 +113,22 @@ def test_post_results_json_returns_422_when_team_missing(aws_env):
         ],
     }
 
-    response = client.post("/results/json", json=payload)
+
+    response = client.post("/results/json", json=payload, headers=AUTH_HEADER)
 
     assert response.status_code == 422
+
+
+def test_post_results_json_returns_401_when_key_missing(aws_env):
+    # No API key header → auth rejects before the payload is even looked at.
+    # Payload is irrelevant here; we send an empty body on purpose.
+
+    response = client.post("/results/json", json={})
+    
+    assert response.status_code == 401
+
+def test_post_results_json_returns_401_when_key_invalid(aws_env):
+# Wrong API key → auth rejects before the payload is looked at.
+    response = client.post("/results/json", json={}, headers={"X-API-Key": "wrong-key"})
+    
+    assert response.status_code == 401
