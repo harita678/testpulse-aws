@@ -17,11 +17,11 @@ resource "aws_instance" "ingestor" {
 
   #User Data - it is available on EC2 instance
   user_data = templatefile("${path.module}/user-data-testpulse.sh.tftpl", {
-    db_host     = var.DB_HOST
-    db_port     = var.DB_PORT
-    db_name     = var.DB_NAME
-    db_username = var.DB_USERNAME
-    db_secret_arn = aws_secretsmanager_secret.db_password.arn
+    db_host           = var.DB_HOST
+    db_port           = var.DB_PORT
+    db_name           = var.DB_NAME
+    db_username       = var.DB_USERNAME
+    db_secret_arn     = aws_secretsmanager_secret.db_password.arn
     testpulse_api_key = var.TESTPULSE_API_KEY
 
   })

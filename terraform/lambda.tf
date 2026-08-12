@@ -12,8 +12,8 @@ resource "aws_lambda_function" "processor" {
   timeout       = 30
 
   # Code (the ZIP)
-  filename         = "/Users/harita/aws-lab/05-testpulse/processor/lambda-deployment.zip"
-  source_code_hash = filebase64sha256("/Users/harita/aws-lab/05-testpulse/processor/lambda-deployment.zip")
+  filename         = "${path.module}/../processor/lambda-deployment.zip"
+  source_code_hash = filebase64sha256("${path.module}/../processor/lambda-deployment.zip")
 
   # VPC config (nested block)
   vpc_config {
@@ -27,12 +27,12 @@ resource "aws_lambda_function" "processor" {
   # Environment variables (nested block)
   environment {
     variables = {
-      DB_HOST             = var.DB_HOST
-      DB_PORT             = var.DB_PORT
-      DB_NAME             = var.DB_NAME
-      DB_USERNAME         = var.DB_USERNAME
+      DB_HOST       = var.DB_HOST
+      DB_PORT       = var.DB_PORT
+      DB_NAME       = var.DB_NAME
+      DB_USERNAME   = var.DB_USERNAME
       DB_SECRET_ARN = aws_secretsmanager_secret.db_password.arn
-      
+
       AWS_EMF_ENVIRONMENT = "Lambda"
     }
   }
