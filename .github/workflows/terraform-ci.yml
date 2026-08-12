@@ -37,8 +37,8 @@ jobs:
       - name: Check formatting
         run: terraform fmt -check -recursive
 
-      - name: Initialize (no backend — local only, no AWS needed)
-        run: terraform init -backend=false
-
-      - name: Validate configuration
-        run: terraform validate
+# NOTE: `terraform validate` is not run here yet. It requires the Lambda
+      # deployment package to exist to compute its hash, and that artifact is a
+      # build output (gitignored), so it isn't available on a clean runner.
+      # Next step: build the Lambda package from source (archive_file + a
+      # dependency install step) so validate can run in CI too.

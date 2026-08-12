@@ -12,8 +12,8 @@ resource "aws_lambda_function" "processor" {
   timeout       = 30
 
   # Code (the ZIP)
-  filename         = "/Users/harita/aws-lab/05-testpulse/processor/lambda-deployment.zip"
-  source_code_hash = filebase64sha256("/Users/harita/aws-lab/05-testpulse/processor/lambda-deployment.zip")
+  filename         = "${path.module}/../processor/lambda-deployment.zip"
+  source_code_hash = filebase64sha256("${path.module}/../processor/lambda-deployment.zip")
 
   # VPC config (nested block)
   vpc_config {
