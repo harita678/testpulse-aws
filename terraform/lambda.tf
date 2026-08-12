@@ -27,12 +27,12 @@ resource "aws_lambda_function" "processor" {
   # Environment variables (nested block)
   environment {
     variables = {
-      DB_HOST             = var.DB_HOST
-      DB_PORT             = var.DB_PORT
-      DB_NAME             = var.DB_NAME
-      DB_USERNAME         = var.DB_USERNAME
+      DB_HOST       = var.DB_HOST
+      DB_PORT       = var.DB_PORT
+      DB_NAME       = var.DB_NAME
+      DB_USERNAME   = var.DB_USERNAME
       DB_SECRET_ARN = aws_secretsmanager_secret.db_password.arn
-      
+
       AWS_EMF_ENVIRONMENT = "Lambda"
     }
   }

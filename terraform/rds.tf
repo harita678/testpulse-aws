@@ -23,7 +23,7 @@ resource "aws_db_instance" "testpulse_db" {
 
   multi_az            = false
   publicly_accessible = false
-  apply_immediately = true
+  apply_immediately   = true
 
   vpc_security_group_ids = [aws_security_group.db.id]
 

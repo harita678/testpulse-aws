@@ -1,0 +1,44 @@
+# Terraform CI — format and validity checks for the infrastructure code.
+#
+# Level 1 checks only: these are READ-ONLY and never touch AWS or the remote
+# state. `fmt -check` verifies formatting; `validate` verifies the config is
+# syntactically valid and internally consistent. We pass -backend=false to
+# validate so it does NOT connect to the S3 backend — no AWS credentials needed.
+
+name: Terraform CI
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+  pull_request:
+    branches: [main]
+    paths:
+      - 'terraform/**'
+      - '.github/workflows/terraform-ci.yml'
+
+jobs:
+  terraform-checks:
+    runs-on: ubuntu-latest
+
+    defaults:
+      run:
+        working-directory: terraform
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Set up Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Check formatting
+        run: terraform fmt -check -recursive
+
+      - name: Initialize (no backend — local only, no AWS needed)
+        run: terraform init -backend=false
+
+      - name: Validate configuration
+        run: terraform validate
