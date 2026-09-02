@@ -1,0 +1,23 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: testpulse
+spec:
+  ingressClassName: {{ .Values.ingress.className }}
+  rules:
+    - http:
+        paths:
+          - path: /results
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.services.ingestor.name }}
+                port:
+                  number: {{ .Values.services.ingestor.port }}
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: {{ .Values.services.dashboard.name }}
+                port:
+                  number: {{ .Values.services.dashboard.port }}

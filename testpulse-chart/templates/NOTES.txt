@@ -1,0 +1,7 @@
+TestPulse chart installed.
+
+Release: {{ .Release.Name }}
+Namespace: {{ .Release.Namespace }}
+
+Check what was created:
+  kubectl get all

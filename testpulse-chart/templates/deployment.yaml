@@ -1,0 +1,46 @@
+{{ range .Values.services }}
+
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ .name }}
+  labels:
+    app: {{ .app }}
+spec:
+  replicas: {{ .replicas }}
+  selector:
+    matchLabels:
+      app: {{ .app }}
+  template:
+    metadata:
+      labels:
+        app: {{ .app }}
+    spec:
+      containers:
+        - name: {{ .name }}
+          image: "{{ .image.repository }}:{{ .image.tag }}"
+          imagePullPolicy: {{ .image.pullPolicy }}
+          ports:
+            - containerPort: {{ .port }}
+          envFrom:
+            - configMapRef:
+                name: {{ .name }}-config
+            - secretRef:
+                name: {{ .name }}-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: {{ .port }}
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: {{ .port }}
+            initialDelaySeconds: 3
+            periodSeconds: 5
+              
+
+
+---
+{{ end }}

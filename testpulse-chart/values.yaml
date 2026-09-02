@@ -1,0 +1,37 @@
+services:
+  ingestor:
+    port: 8000
+    name: ingestor
+    app:  ingestor
+    replicas: 3
+    image:  
+      repository: testpulse-ingestor
+      tag: latest
+      pullPolicy: IfNotPresent
+    config:
+      AWS_REGION: "ca-central-1"
+      S3_BUCKET_NAME: "harita-testpulse-raw-2026"
+      SQS_QUEUE_URL: "https://sqs.ca-central-1.amazonaws.com/951125265513/harita-testpulse-ingestion-queue"
+    secret:
+      TESTPULSE_API_KEY: "local-dev-key-123"
+  dashboard:
+    port: 8001
+    name: dashboard
+    app:  dashboard
+    replicas: 2
+    image:  
+      repository: testpulse-dashboard
+      tag: latest
+      pullPolicy: IfNotPresent
+    config:
+      AWS_DEFAULT_REGION: "ca-central-1"
+      DB_HOST: "postgres"
+      DB_PORT: "5432"
+      DB_NAME: "testpulse_db"
+      DB_USERNAME: "testpulse_admin"
+    secret:
+      DB_PASSWORD: "localdevpass"
+      
+ingress:
+  className: nginx
+
