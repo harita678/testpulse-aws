@@ -1,0 +1,7 @@
+services:
+  ingestor:
+    replicas: 1
+  dashboard:
+    replicas: 1
+ingress:
+  host: dev.testpulse.local
