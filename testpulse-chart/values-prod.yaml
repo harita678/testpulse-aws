@@ -1,0 +1,13 @@
+services:
+  ingestor:
+    replicas: 4
+    image:
+      tag: v1.2.0
+      pullPolicy: Always
+  dashboard:
+    replicas: 3
+    image:
+      tag: v1.2.0
+      pullPolicy: Always
+ingress:
+  host: prod.testpulse.local

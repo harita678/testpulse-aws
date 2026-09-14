@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: ingestor
+  labels:
+    app: ingestor
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: ingestor
+  template:
+    metadata:
+      labels:
+        app: ingestor
+    spec:
+      containers:
+        - name: ingestor
+          image: testpulse-ingestor:latest
+          imagePullPolicy: IfNotPresent
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef: 
+                name: ingestor-config
+            - secretRef:
+                name: ingestor-secret
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 5
+            periodSeconds: 10
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 3
+            periodSeconds: 5
+    
+          
